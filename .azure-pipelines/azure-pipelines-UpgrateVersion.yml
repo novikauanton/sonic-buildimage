@@ -35,6 +35,7 @@ parameters:
     default:
     - vs
     - broadcom
+    - barefoot
     - centec
     - generic
     - innovium
