@@ -88,7 +88,7 @@ enum log_level_type
     WARN = 2,
     NOTICE= 3,
     INFO = 4,
-    DEBUG = 5
+    DEBUG_ = 5
 };
 
 struct mclagdctl_req_hdr

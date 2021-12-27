@@ -1144,7 +1144,7 @@ int main(int argc, char **argv)
                     break;
 
                 case 'd':
-                    para_int = DEBUG;
+                    para_int = DEBUG_;
                     break;
 
                 default:
