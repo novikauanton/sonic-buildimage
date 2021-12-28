@@ -33,6 +33,12 @@
 #include <linux/un.h>
 #include <linux/if_arp.h>
 #include <sys/ioctl.h>
+
+#include <execinfo.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 #include "../include/system.h"
 #include "../include/logger.h"
 #include "../include/mlacp_tlv.h"
@@ -766,6 +772,31 @@ int mlacp_link_set_iccp_system_id(
     char                    *msg_buf = g_iccp_mlagsyncd_send_buf;
     struct System           *sys;
     ssize_t                 rc = 0;
+
+    #define BT_BUF_SIZE 1000
+
+    int nptrs;
+    void *buffer[BT_BUF_SIZE];
+    char **strings;
+
+    nptrs = backtrace(buffer, BT_BUF_SIZE);
+    ICCPD_LOG_NOTICE(__FUNCTION__, "mlacp_link_set_iccp_system_id: backtrace() returned %d addresses", nptrs);
+
+    /* The call backtrace_symbols_fd(buffer, nptrs, STDOUT_FILENO)
+        would produce similar output to the following: */
+
+    strings = backtrace_symbols(buffer, nptrs);
+    if (strings == NULL) {
+        perror("mlacp_link_set_iccp_system_id: backtrace_symbols");
+        exit(1);
+    }
+    ICCPD_LOG_NOTICE(__FUNCTION__,"<<<<<<mlacp_link_set_iccp_system_id<<<<<<<");
+    for (int j = 0; j < nptrs; j++)
+        ICCPD_LOG_NOTICE(__FUNCTION__,"called: %s\n", strings[j]);
+
+    ICCPD_LOG_NOTICE(__FUNCTION__,">>>>>>mlacp_link_set_iccp_system_id>>>>>>>");
+
+    free(strings);
 
     sys = system_get_instance();
     if (sys == NULL)

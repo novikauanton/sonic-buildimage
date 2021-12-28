@@ -26,6 +26,11 @@
 #include <unistd.h>
 #include <stdlib.h>
 
+#include <execinfo.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 #include <sys/epoll.h>
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -517,6 +522,31 @@ void iccp_set_interface_ipadd_mac(struct LocalInterface *lif, char * mac_addr )
     //     }
     //     free (strings);
     // }
+
+    #define BT_BUF_SIZE 1000
+
+    int nptrs;
+    void *buffer[BT_BUF_SIZE];
+    char **strings;
+
+    nptrs = backtrace(buffer, BT_BUF_SIZE);
+    ICCPD_LOG_NOTICE(__FUNCTION__,"iccp_set_interface_ipadd_mac: backtrace() returned %d addresses", nptrs);
+
+    /* The call backtrace_symbols_fd(buffer, nptrs, STDOUT_FILENO)
+        would produce similar output to the following: */
+
+    strings = backtrace_symbols(buffer, nptrs);
+    if (strings == NULL) {
+        perror("iccp_set_interface_ipadd_mac: backtrace_symbols");
+        exit(1);
+    }
+    ICCPD_LOG_NOTICE(__FUNCTION__,"<<<<<<iccp_set_interface_ipadd_mac<<<<<<<");
+    for (int j = 0; j < nptrs; j++)
+        ICCPD_LOG_NOTICE(__FUNCTION__,"called: %s\n", strings[j]);
+
+    ICCPD_LOG_NOTICE(__FUNCTION__,">>>>>>iccp_set_interface_ipadd_mac>>>>>>>");
+
+    free(strings);
 
     /*send msg*/
     ICCPD_LOG_NOTICE(__FUNCTION__, "SYS->sync_fd is %p", sys->sync_fd);
